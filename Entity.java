@@ -22,7 +22,6 @@ public class Entity
     }
 
 
-
     public void move()
     {
         for (int i = 0; i < 3; i++) {
