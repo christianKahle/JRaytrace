@@ -2,7 +2,7 @@
 public class Entity
 {
     protected double pos[], vel[], rot[], rvl[];
-    public static final double ZEROS = {0.0,0.0,0.0};
+    public static final double ZEROS[] = {0.0,0.0,0.0};
     public Entity()
     {
         this(ZEROS,ZEROS,ZEROS,ZEROS);
