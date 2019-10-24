@@ -26,6 +26,10 @@ public class Camera extends Entity
         fov = fieldofview;
     }
     
+    @Override
+    public boolean rayhit(double[] cameraPosition, double tyx, double tzx) {
+        return false;
+    }
 
     /**
      * @param fov the fov to set

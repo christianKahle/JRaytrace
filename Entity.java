@@ -1,5 +1,5 @@
 
-public class Entity
+public abstract class Entity
 {
     protected double pos[], vel[], rot[], rvl[];
     public static final double D3ZERO[] = {0.0,0.0,0.0};
@@ -22,12 +22,37 @@ public class Entity
         rvl = rotationalVelocity;
     }
 
+    public abstract boolean rayhit(double[] cameraPosition, double tyx, double tzx);
 
     public void move()
     {
         for (int i = 0; i < 3; i++) {
             pos[i] += vel[i];
-            rot[i] += rvl[i];
         }
+    }
+
+    /**
+     * @return the pos
+     */
+    public double[] getPos() {
+        return pos;
+    }
+    /**
+     * @return the rot
+     */
+    public double[] getRot() {
+        return rot;
+    }
+    /**
+     * @return the rvl
+     */
+    public double[] getRvl() {
+        return rvl;
+    }
+    /**
+     * @return the vel
+     */
+    public double[] getVel() {
+        return vel;
     }
 }
