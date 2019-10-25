@@ -7,24 +7,33 @@ public class Sphere extends Entity
         super();
         this.radius = radius;
     }
-    public Sphere(double position[], double velocity[], double rotation[], double rotationalVelocity[], double radius)
+    public Sphere(  double xposition, double yposition, double zposition,
+                    double xvelocity, double yvelocity, double zvelocity,
+                    double yxrotation, double zxrotation,
+                    double yxrotavelo, double zxrotavelo,
+                    double radius)
     {
-        super(position,velocity,rotation,rotationalVelocity);
+        super(xposition,yposition,zposition,xvelocity,yvelocity,zvelocity,yxrotation,zxrotation,yxrotavelo,zxrotavelo);
         this.radius = radius;
     }
 
-    //TODO Fix eyes in the back of head
     @Override
-    public boolean rayhit(Camera camera, int width, int height, int x, int y) {
-        double tzx = (double)camera.getFov()/width*(x-width/2)*Math.PI/180;
-        double tyx = ((double)camera.getFov()*((double)height/width)*(y-width/2))/height*Math.PI/180;
+    public boolean rayhit(double[] cameraposition,double[] camerarotation, double fov, int width, int height, int x, int y) {
         double position[] = new double[3];
         for(int i = 0; i < 3; i++)
-            position[i] = pos[i] - camera.getPos()[i];
+            position[i] = pos[i] - cameraposition[i];
+        double ayx = Math.atan(position[1]/position[0]);
+        double azx = Math.atan(position[2]/position[0]);
+        if (Math.signum(ayx+camerarotation[0]) == -1.0)// || Math.signum(azx+camera.getRot()[1]) == -1.0)
+            return false;
+
+        double tyx = ((double)fov/((double)width/height)*(y-height/2))/height*Math.PI/180+camerarotation[1];
+        double tzx = (double)fov/width*(x-width/2)*Math.PI/180+camerarotation[0];
         double rad = Math.sqrt(position[0]*position[0]+position[1]*position[1]+position[2]*position[2]);
-        double tzx1 = tzx + Math.atan(position[2]/position[0]);
-        double tyx1 = tyx + Math.atan(position[1]/position[0]);
-        return Math.sqrt(Math.pow(rad*Math.sin(tyx1),2)+Math.pow(rad*Math.sin(tzx1),2)) < radius;
+        double cyx = Math.sin(ayx+tyx);
+        double czx = Math.sin(azx+tzx);    
+        double d = Math.sqrt(rad*rad*cyx*cyx+rad*rad*czx*czx);
+        return d < radius;
     }
     /**
      * @return the radius

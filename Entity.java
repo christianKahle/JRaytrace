@@ -1,28 +1,39 @@
 
 public abstract class Entity
 {
-    protected double pos[], vel[], rot[], rvl[];
+    protected double pos[] = new double[3], vel[] = new double[3], rot[] = new double [2], rvl[] = new double [2];
     public static final double D3ZERO[] = {0.0,0.0,0.0};
     public static final double D2ZERO[] = {0.0,0.0};
     public Entity()
     {
-        this(D3ZERO,D3ZERO,D3ZERO,D3ZERO);
+        this(0.0,0.0,0.0, 0.0,0.0,0.0, 0.0,0.0, 0.0,0.0);
     }
+    
     /**
-     * @param position entitie's position as {x,y,z} 
-     * @param velocity entitie's velocity as {x,y,z} 
-     * @param rotation entitie's rotation along each axis as {x,y} 
-     * @param rotationalvelocity entitie's rotational velocity along each axis as {x,y} 
+     * @param xposition
+     * @param yposition
+     * @param zposition
+     * @param xvelocity
+     * @param yvelocity
+     * @param zvelocity
+     * @param yxrotation
+     * @param zxrotation
+     * @param yxrotavelo
+     * @param zxrotavelo
      */
-    public Entity(double position[], double velocity[], double rotation[], double rotationalVelocity[])
+    public Entity(  double xposition, double yposition, double zposition,
+                    double xvelocity, double yvelocity, double zvelocity,
+                    double yxrotation, double zxrotation,
+                    double yxrotavelo, double zxrotavelo)
     {
-        pos = position;
-        vel = velocity;
-        rot = rotation;
-        rvl = rotationalVelocity;
+        pos[0] = xposition; pos[1] = yposition; pos[2] = zposition;
+        vel[0] = xvelocity; vel[1] = yvelocity; vel[2] = zvelocity;
+
+        rot[0] = yxrotation; rot[1] = zxrotation;
+        rvl[0] = yxrotavelo; rvl[1] = zxrotavelo;
     }
 
-    public abstract boolean rayhit(Camera camera, int windowWidth, int windowHeight, int x, int y);
+    public abstract boolean rayhit(double[] cameraposition,double[] camerarotation, double fov, int width, int height, int x, int y);
 
     public void move()
     {
@@ -54,5 +65,18 @@ public abstract class Entity
      */
     public double[] getVel() {
         return vel;
+    }
+
+    /**
+     * @param rot the rot to set
+     */
+    public void setRot(double[] rot) {
+        this.rot = rot;
+    }
+    /**
+     * @param vel the vel to set
+     */
+    public void setVel(double[] vel) {
+        this.vel = vel;
     }
 }

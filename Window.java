@@ -1,9 +1,10 @@
 import java.awt.*;
-import java.awt.event.KeyEvent;
 import java.awt.image.BufferedImage;
 import javax.swing.JFrame;
+
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
 /**
@@ -13,14 +14,16 @@ public class Window extends JFrame
 {
         boolean isRunning = true;
         ArrayList<Entity> entities;
-        Color backColor = Color.WHITE;
-        Color frontColor = Color.BLACK;
-        Camera selectedCamera = new Camera("jim", 90);
-        int fps = 30;
+        Color backColor = Color.BLACK;
+        Color frontColor = Color.WHITE;
+        Camera selectedCamera = new Camera("NONE", 75);
+        int fps = 60;
         int windowWidth = 500;
         int windowHeight = 500;
         int x,y;
+        int button = 0;
         static Window simulation;
+        Graphics g, bbg;
 
         BufferedImage backBuffer;
         Insets insets;
@@ -28,32 +31,38 @@ public class Window extends JFrame
         public Window()
         {
                 super();
-                this.addMouseListener(new MouseAdapter() {
-                        /*
-                        public void mousePressed(MouseEvent event)
-                        {
-                                if(button == 0){
-                                        button = event.getButton();
-                                        switch (button){
-                                                case (1):
-                                                        break;
-                                                case (3):
-                                                        break;
-                                                default:
-                                                        break;
-                                        }
-                                }
-                        }
-                        public void mouseReleased(MouseEvent event)
-                        {
-                        }
-                        */
-                });   
+                MouseAdapter mouse = new MouseAdapter() {
+                    public void mousePressed(MouseEvent event)
+                    {
+                            if(button == 0){
+                                    button = event.getButton();
+                                    switch (button){
+                                            case (1):
+                                                    break;
+                                            case (3):
+                                                    break;
+                                            default:
+                                                    break;
+                                    }
+                            }
+                    }
+                    public void mouseReleased(MouseEvent event)
+                    {
+                        button = 0;
+                    }
+                    public void mouseWheelMoved(MouseWheelEvent event)
+                    {
+                        selectedCamera.setFov(selectedCamera.getFov()+event.getWheelRotation()*2);
+                        System.out.println(selectedCamera.getFov());
+                    }
+            };
+                this.addMouseListener(mouse);   
+                this.addMouseWheelListener(mouse);
         }
         public static void main(String[] args)
         {
                 simulation = new Window();
-                simulation.run();
+                simulation.simulate();
                 System.exit(0);
         }
 
@@ -66,7 +75,7 @@ public class Window extends JFrame
         /**
          * This method starts the simulation and runs it in a loop
          */
-        public void run()
+        public void simulate()
         {
                 initialize();
                 int frames = 0;
@@ -102,14 +111,18 @@ public class Window extends JFrame
          */
         void initialize()
         {
-                setTitle("Run");
+                setTitle("Simulation");
                 setSize(windowWidth, windowHeight);
                 setResizable(true);
                 setDefaultCloseOperation(EXIT_ON_CLOSE);
                 setVisible(true);
+
                 entities = new ArrayList<Entity>();
-                double[] p = {100.0,0.1,0.0}, v = {-1.0,0.0,0.0}, r = {0.0,0.0}, p2 = {100.0,20.0,0.0};
-                entities.add(new Sphere(p2,v,r,r,5.0));
+                for (int i = 0; i < 2; i++) {
+                    entities.add(new Sphere(50.0,0.0,i*75.0, 0.0,0.0,-1.0, 0.0,0.0, 0.0,0.0, 10.0));
+                    entities.add(new Sphere(100.0,0.0,i*75.0, 0.0,0.0,-1.0, 0.0,0.0, 0.0,0.0, 10.0));
+                }
+
 
                 insets = getInsets();
                 setSize(insets.left + windowWidth + insets.right,
@@ -126,7 +139,7 @@ public class Window extends JFrame
         {       
                 for (Entity e : entities) {
                         
-                        e.move();  
+                        e.move();
                         
                 }
         }
@@ -138,32 +151,30 @@ public class Window extends JFrame
         void draw()
         {       
 
-                Graphics g = getGraphics();
+                g = getGraphics();
 
-                Graphics bbg = backBuffer.getGraphics();
+                bbg = backBuffer.getGraphics();
 
                 bbg.setColor(backColor);
                 bbg.fillRect(0, 0, simulation.getWidth(), simulation.getHeight());
                 bbg.setColor(frontColor);
-                for (x = 0; x < simulation.getWidth(); x++) {
-                        for (y = 0; y < simulation.getHeight(); y++) {
-                                if(ray(x,simulation.getWidth(),y,simulation.getHeight()))
-                                    {
-                                        bbg.drawLine(x, y, x, y);
-                                    }
-                        }
-                }
+                rays();
 
                 g.drawImage(backBuffer, insets.left, insets.top, this);
         }
 
-        public boolean ray(int x, int w, int y, int h)
+        public void rays()
         {
-            for (Entity en : entities)
-            {
-                if (en.rayhit(selectedCamera,simulation.getWidth(),simulation.getHeight(),x,y))
-                    return true;   
-            }
-            return false;
+            int w = simulation.getWidth();
+            int h = simulation.getHeight();
+            int fov = selectedCamera.getFov();
+            double[] p = selectedCamera.getPos();
+            double[] r = selectedCamera.getRot();
+            for (x = 0; x < simulation.getWidth(); x++) {
+                for (y = 0; y < simulation.getHeight(); y++) {
+                    for (Entity en : entities) {if (en.rayhit(p,r,fov,w,h,x,y)) bbg.drawLine(x, y, x, y);} 
+                }
+        }
+            
         }
 }

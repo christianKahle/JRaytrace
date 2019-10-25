@@ -14,20 +14,28 @@ public class Camera extends Entity
         this.name = name;
         fov = fieldofview;
     }
-    public Camera(double position[], double velocity[], double rotation[], double rotationalVelocity[], String name)
+    public Camera(  double xposition, double yposition, double zposition,
+                    double xvelocity, double yvelocity, double zvelocity,
+                    double yxrotation, double zxrotation,
+                    double yxrotavelo, double zxrotavelo,
+                    String name)
     {
-        super(position,velocity,rotation,rotationalVelocity);
+        super(xposition,yposition,zposition,xvelocity,yvelocity,zvelocity,yxrotation,zxrotation,yxrotavelo,zxrotavelo);
         this.name = name;
     }
-    public Camera(double position[], double velocity[], double rotation[], double rotationalVelocity[], String name, int fieldofview)
+    public Camera(  double xposition, double yposition, double zposition,
+                    double xvelocity, double yvelocity, double zvelocity,
+                    double yxrotation, double zxrotation,
+                    double yxrotavelo, double zxrotavelo,
+                    String name, int fieldofview)
     {
-        super(position,velocity,rotation,rotationalVelocity);
+        super(xposition,yposition,zposition,xvelocity,yvelocity,zvelocity,yxrotation,zxrotation,yxrotavelo,zxrotavelo);
         this.name = name;
         fov = fieldofview;
     }
     
     @Override
-    public boolean rayhit(Camera camera, int width, int height,int x,int y) {
+    public boolean rayhit(double[] cameraposition,double[] camerarotation, double fov, int width, int height, int x, int y) {
         return false;
     }
 
