@@ -15,10 +15,12 @@ public class Sphere extends Entity
 
     //TODO Fix eyes in the back of head
     @Override
-    public boolean rayhit(double[] cameraposition, double tzx, double tyx) {
+    public boolean rayhit(Camera camera, int width, int height, int x, int y) {
+        double tzx = (double)camera.getFov()/width*(x-width/2)*Math.PI/180;
+        double tyx = ((double)camera.getFov()*((double)height/width)*(y-width/2))/height*Math.PI/180;
         double position[] = new double[3];
         for(int i = 0; i < 3; i++)
-            position[i] = pos[i] - cameraposition[i];
+            position[i] = pos[i] - camera.getPos()[i];
         double rad = Math.sqrt(position[0]*position[0]+position[1]*position[1]+position[2]*position[2]);
         double tzx1 = tzx + Math.atan(position[2]/position[0]);
         double tyx1 = tyx + Math.atan(position[1]/position[0]);

@@ -22,7 +22,7 @@ public abstract class Entity
         rvl = rotationalVelocity;
     }
 
-    public abstract boolean rayhit(double[] cameraPosition, double tyx, double tzx);
+    public abstract boolean rayhit(Camera camera, int windowWidth, int windowHeight, int x, int y);
 
     public void move()
     {

@@ -27,7 +27,7 @@ public class Camera extends Entity
     }
     
     @Override
-    public boolean rayhit(double[] cameraPosition, double tyx, double tzx) {
+    public boolean rayhit(Camera camera, int width, int height,int x,int y) {
         return false;
     }
 

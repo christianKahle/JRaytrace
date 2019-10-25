@@ -159,11 +159,9 @@ public class Window extends JFrame
 
         public boolean ray(int x, int w, int y, int h)
         {
-            double tzx = (double)selectedCamera.getFov()/w*(x-w/2)*Math.PI/180;
-            double tyx = ((double)selectedCamera.getFov()*((double)h/w)*(y-w/2))/h*Math.PI/180;
             for (Entity en : entities)
             {
-                if (en.rayhit(selectedCamera.getPos(),tyx,tzx))
+                if (en.rayhit(selectedCamera,simulation.getWidth(),simulation.getHeight(),x,y))
                     return true;   
             }
             return false;
