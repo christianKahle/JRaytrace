@@ -23,23 +23,35 @@ public abstract class Entity
      */
     public Entity(  double xposition, double yposition, double zposition,
                     double xvelocity, double yvelocity, double zvelocity,
-                    double yxrotation, double zxrotation,
-                    double yxrotavelo, double zxrotavelo)
+                    double zenithrotation, double azumithrotation,
+                    double zenithvelocity, double azumithvelocity)
     {
         pos[0] = xposition; pos[1] = yposition; pos[2] = zposition;
         vel[0] = xvelocity; vel[1] = yvelocity; vel[2] = zvelocity;
 
-        rot[0] = yxrotation; rot[1] = zxrotation;
-        rvl[0] = yxrotavelo; rvl[1] = zxrotavelo;
+        rot[0] = zenithrotation; rot[1] = azumithrotation;
+        rvl[0] = zenithvelocity; rvl[1] = azumithvelocity;
     }
 
-    public abstract boolean rayhit(double[] cameraposition,double[] camerarotation, double fov, int width, int height, int x, int y);
+    public abstract boolean rayhit(double[] rayorigin,double zenith, double azumith, int n);
 
     public void move()
     {
         for (int i = 0; i < 3; i++) {
             pos[i] += vel[i];
         }
+    }
+
+    public static double dotproduct(double[] v1,double[] v2)
+    {
+        if(v1.length != v2.length)
+            throw new IndexOutOfBoundsException();
+        double sum = 0;
+        for(int i = 0; i < v1.length; i++)
+        {
+            sum += v1[i]*v2[i];
+        }
+        return sum;
     }
 
     /**

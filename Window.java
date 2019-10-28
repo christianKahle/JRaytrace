@@ -16,8 +16,8 @@ public class Window extends JFrame
         ArrayList<Entity> entities;
         Color backColor = Color.BLACK;
         Color frontColor = Color.WHITE;
-        Camera selectedCamera = new Camera("NONE", 75);
-        int fps = 60;
+        Camera selectedCamera = new Camera("NONE", 360);
+        int fps = 20;
         int windowWidth = 500;
         int windowHeight = 500;
         int x,y;
@@ -34,17 +34,7 @@ public class Window extends JFrame
                 MouseAdapter mouse = new MouseAdapter() {
                     public void mousePressed(MouseEvent event)
                     {
-                            if(button == 0){
-                                    button = event.getButton();
-                                    switch (button){
-                                            case (1):
-                                                    break;
-                                            case (3):
-                                                    break;
-                                            default:
-                                                    break;
-                                    }
-                            }
+                            update();
                     }
                     public void mouseReleased(MouseEvent event)
                     {
@@ -83,9 +73,8 @@ public class Window extends JFrame
                 {
                         long time = System.currentTimeMillis();
                         
-                        update();
+                        //update();
                         draw();
-
                         
                         //  delay for each frame  -   time it took for one frame
                         time = (1000 / fps) - (System.currentTimeMillis() - time);
@@ -118,12 +107,13 @@ public class Window extends JFrame
                 setVisible(true);
 
                 entities = new ArrayList<Entity>();
-                for (int i = 0; i < 2; i++) {
-                    entities.add(new Sphere(50.0,0.0,i*75.0, 0.0,0.0,-1.0, 0.0,0.0, 0.0,0.0, 10.0));
-                    entities.add(new Sphere(100.0,0.0,i*75.0, 0.0,0.0,-1.0, 0.0,0.0, 0.0,0.0, 10.0));
-                }
+                //for (int i = 0; i < 2; i++) {entities.add(new Sphere(50.0,5.0,i*75.0, 0.0,0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));entities.add(new Sphere(100.0,5.0,i*75.0, 0.0,-0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));}
+                
+                entities.add(new Sphere(0.0,0.0,10.0, 0.0,0.0,0.0, 0.0,0.0, 0.0,0.0, 5.0));
+                //entities.add(new Sphere(0.0,0.0,10.0, 0.0,1.0,0.0, 0.0,0.0, 0.0,0.0, 5.0));
 
-
+                double[] rot = {Math.PI,-Math.PI/8*0};
+                selectedCamera.setRot(rot);
                 insets = getInsets();
                 setSize(insets.left + windowWidth + insets.right,
                                 insets.top + windowHeight + insets.bottom);
@@ -159,20 +149,20 @@ public class Window extends JFrame
                 bbg.fillRect(0, 0, simulation.getWidth(), simulation.getHeight());
                 bbg.setColor(frontColor);
                 rays();
+                bbg.setColor(Color.DARK_GRAY);
+                bbg.drawLine(simulation.getWidth()/2,simulation.getHeight()/2-5,simulation.getWidth()/2,simulation.getHeight()/2+5);
+                bbg.drawLine(simulation.getWidth()/2-5,simulation.getHeight()/2,simulation.getWidth()/2+5,simulation.getHeight()/2);
 
                 g.drawImage(backBuffer, insets.left, insets.top, this);
         }
 
         public void rays()
         {
-            int w = simulation.getWidth();
-            int h = simulation.getHeight();
-            int fov = selectedCamera.getFov();
             double[] p = selectedCamera.getPos();
-            double[] r = selectedCamera.getRot();
+            double rpp = (double)selectedCamera.getFov()/simulation.getWidth()*Math.PI/180;
             for (x = 0; x < simulation.getWidth(); x++) {
                 for (y = 0; y < simulation.getHeight(); y++) {
-                    for (Entity en : entities) {if (en.rayhit(p,r,fov,w,h,x,y)) bbg.drawLine(x, y, x, y);} 
+                    for (Entity en : entities) {if (en.rayhit(p,rpp*(y-simulation.getHeight()/2) - selectedCamera.getRot()[0],rpp*(x-simulation.getWidth()/2) - selectedCamera.getRot()[1], 0)) bbg.drawLine(x, y, x, y);} 
                 }
         }
             

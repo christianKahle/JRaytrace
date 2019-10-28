@@ -9,32 +9,22 @@ public class Sphere extends Entity
     }
     public Sphere(  double xposition, double yposition, double zposition,
                     double xvelocity, double yvelocity, double zvelocity,
-                    double yxrotation, double zxrotation,
-                    double yxrotavelo, double zxrotavelo,
+                    double zenithrotation, double azumithrotation,
+                    double zenithvelocity, double azumithvelocity,
                     double radius)
     {
-        super(xposition,yposition,zposition,xvelocity,yvelocity,zvelocity,yxrotation,zxrotation,yxrotavelo,zxrotavelo);
+        super(xposition,yposition,zposition,xvelocity,yvelocity,zvelocity,zenithrotation,azumithrotation,zenithvelocity,zenithvelocity);
         this.radius = radius;
     }
 
     @Override
-    public boolean rayhit(double[] cameraposition,double[] camerarotation, double fov, int width, int height, int x, int y) {
-        double position[] = new double[3];
-        for(int i = 0; i < 3; i++)
-            position[i] = pos[i] - cameraposition[i];
-        double ayx = Math.atan(position[1]/position[0]);
-        double azx = Math.atan(position[2]/position[0]);
-        if (Math.signum(ayx+camerarotation[0]) == -1.0)// || Math.signum(azx+camera.getRot()[1]) == -1.0)
-            return false;
-
-        double tyx = ((double)fov/((double)width/height)*(y-height/2))/height*Math.PI/180+camerarotation[1];
-        double tzx = (double)fov/width*(x-width/2)*Math.PI/180+camerarotation[0];
-        double rad = Math.sqrt(position[0]*position[0]+position[1]*position[1]+position[2]*position[2]);
-        double cyx = Math.sin(ayx+tyx);
-        double czx = Math.sin(azx+tzx);    
-        double d = Math.sqrt(rad*rad*cyx*cyx+rad*rad*czx*czx);
-        return d < radius;
+    public boolean rayhit(double[] rayorigin, double zenith, double azumith, int n) {
+        double v[] = {pos[0]-rayorigin[0],pos[1]-rayorigin[1],pos[2]-rayorigin[2]};
+        double d[] = {Math.sin(zenith)*Math.cos(azumith),Math.sin(zenith)*Math.sin(azumith),Math.cos(zenith)};
+        double vd  = dotproduct(v, d);
+        return -vd - Math.sqrt(vd*vd-(dotproduct(v, v)-radius*radius)) > 0;
     }
+
     /**
      * @return the radius
      */
