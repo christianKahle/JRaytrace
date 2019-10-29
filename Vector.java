@@ -18,13 +18,62 @@ public class Vector
         return elements.length;
     }
 
-    public double dotprod(Vector v)
+    public Vector add(Vector that)
     {
-        if(this.length() != v.length())
+        double[] s = new double[elements.length];
+        for (int i = 0; i < elements.length; i++) 
+            s[i] += this.elements[i] + that.elements[i];
+        return new Vector(s);
+    }
+
+    public Vector sub(Vector that)
+    {
+        double[] s = new double[elements.length];
+        for (int i = 0; i < elements.length; i++) 
+            s[i] += this.elements[i] - that.elements[i];
+        return new Vector(s);
+    }
+
+    public double dotprod(Vector that)
+    {
+        if(this.length() != that.length())
             throw new IndexOutOfBoundsException();
         double sum = 0.0;
         for (int i = 0; i < elements.length; i++) 
-            sum += this.elements[i] * v.elements[i];
+            sum += this.elements[i] * that.elements[i];
         return sum;
+    }
+
+    public double abs()
+    {
+        double sum = 0;
+        for (double d : elements) {
+            sum += d*d;
+        }
+        return Math.sqrt(sum);
+    }
+
+    public Vector prod(double that)
+    {
+        double[] e = elements;
+        for (int i = 0; i < e.length; i++) {
+            e[i] = e[i] * that;
+        }
+        return new Vector(e);
+    }
+
+    public Vector norm()
+    {
+        return prod(1.0/abs());
+    }
+
+    public Vector cross(Vector that)
+    {
+        if(!(this.elements.length == that.elements.length && this.elements.length == 3))
+            throw new IndexOutOfBoundsException();
+        double[] s = {  this.elements[1]*that.elements[2]-this.elements[2]*that.elements[1],
+                        this.elements[2]*that.elements[0]-this.elements[0]*that.elements[2],
+                        this.elements[0]*that.elements[1]-this.elements[1]*that.elements[0]};
+        return new Vector(s);
     }
 }

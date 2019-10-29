@@ -7,21 +7,18 @@ public class Sphere extends Entity
         super();
         this.radius = radius;
     }
-    public Sphere(  double xposition, double yposition, double zposition,
-                    double xvelocity, double yvelocity, double zvelocity,
-                    double zenithrotation, double azimuthrotation,
-                    double zenithvelocity, double azimuthvelocity,
-                    double radius)
+    public Sphere(Vector pos, Vector rot, double radius)
     {
-        super(xposition,yposition,zposition,xvelocity,yvelocity,zvelocity,zenithrotation,azimuthrotation,zenithvelocity,zenithvelocity);
+        super(pos,rot);
         this.radius = radius;
     }
 
     @Override
-    public boolean rayhit(double[] rayorigin, double d[], int n) {
-        double v[] = {rayorigin[0]-pos[0],rayorigin[1]-pos[1],rayorigin[2]-pos[2]};
-        double vd  = dotproduct(v, d);
-        return -vd - Math.sqrt(vd*vd-(dotproduct(v, v)-radius*radius)) > 0 || -vd + Math.sqrt(vd*vd-(dotproduct(v, v)-radius*radius)) > 0;
+    public boolean rayhit(Vector rayorigin, Vector direction, int n) {
+        Vector v = rayorigin.sub(this.pos);
+        double vd  = v.dotprod(direction);
+        double v2 = v.dotprod(v);
+        return -vd - Math.sqrt(vd*vd-(v2-radius*radius)) > 0 || -vd + Math.sqrt(vd*vd-(v2-radius*radius)) > 0;
     }
 
     /**

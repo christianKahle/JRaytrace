@@ -7,6 +7,9 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseWheelEvent;
 import java.util.ArrayList;
 
+
+
+
 /**
  * Main class
  */
@@ -114,11 +117,9 @@ public class Window extends JFrame
         entities = new ArrayList<Entity>();
         //for (int i = 0; i < 2; i++) {entities.add(new Sphere(50.0,5.0,i*75.0, 0.0,0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));entities.add(new Sphere(100.0,5.0,i*75.0, 0.0,-0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));}
         
-        entities.add(new Sphere(0.0,0.0,10.0, 0.0,0.0,1.0, 0.0,0.0, 0.0,0.0, 5.0));
+        entities.add(new Sphere(new Vector(0.0,0.0,0.), new Vector(0.0,0.0), 2.0));
         //entities.add(new Sphere(0.0,10.0,0.0, 0.0,1.0,0.0, 0.0,0.0, 0.0,0.0, 5.0));
 
-        double[] rot = {0,0};
-        selectedCamera.setRot(rot);
         insets = getInsets();
         setSize(insets.left + windowWidth + insets.right,
                 insets.top + windowHeight + insets.bottom);
@@ -130,13 +131,8 @@ public class Window extends JFrame
      * This method will check for input, move things
      * around and check for win conditions, etc
      */
-    void update()
-    {       
-        for (Entity e : entities) {
-                    
-            e.move();
-                    
-        }
+    void update(){            
+        //include code to change scenario how you wish
     }
     
 
@@ -166,40 +162,14 @@ public class Window extends JFrame
 
     public void rays()
     {
-        double[] p = selectedCamera.getPos();
-        double[] d = new double[3];
+        Vector p = selectedCamera.getPos();
+        Vector d = new Vector(); //TODO calculate ray direction using pixel rectangle simulation
 
         for (x = -windowWidth/2; x < windowWidth; x++) {
             for (y = -windowHeight/2; y < windowHeight; y++) {
-                d = normalize();
+                
                 for (Entity en : entities) {if (en.rayhit(p, d, 0)) bbg.drawLine(x, y, x, y);} 
             }
         }   
     }   
-
-    public double[] crossproduct(double[] a, double[] b)
-    {
-        if(!(a.length == b.length && a.length == 3))
-            throw new IndexOutOfBoundsException();
-        double[] s = {a[1]*b[2]-a[2]*b[1],a[2]*b[0]-a[0]*b[2],a[0]*b[1]-a[1]*b[0]};
-        return s;
-    }
-    public double magnitude(double[] v)
-    {
-        double sum = 0.0;
-        for (double d : v) {
-            sum += d*d;
-        }
-        return Math.sqrt(sum);
-    }
-    public double[] normalize(double[] v)
-    {
-        double m = magnitude(v);
-        if(m == 1)
-            return v;
-        for (int i = 0; i < v.length; i++) {
-            v[i] = v[i]/m;
-        }
-        return v;
-    }
 }
