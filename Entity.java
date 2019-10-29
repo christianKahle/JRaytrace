@@ -23,17 +23,17 @@ public abstract class Entity
      */
     public Entity(  double xposition, double yposition, double zposition,
                     double xvelocity, double yvelocity, double zvelocity,
-                    double zenithrotation, double azumithrotation,
-                    double zenithvelocity, double azumithvelocity)
+                    double zenithrotation, double azimuthrotation,
+                    double zenithvelocity, double azimuthvelocity)
     {
         pos[0] = xposition; pos[1] = yposition; pos[2] = zposition;
         vel[0] = xvelocity; vel[1] = yvelocity; vel[2] = zvelocity;
 
-        rot[0] = zenithrotation; rot[1] = azumithrotation;
-        rvl[0] = zenithvelocity; rvl[1] = azumithvelocity;
+        rot[0] = zenithrotation; rot[1] = azimuthrotation;
+        rvl[0] = zenithvelocity; rvl[1] = azimuthvelocity;
     }
 
-    public abstract boolean rayhit(double[] rayorigin,double zenith, double azumith, int n);
+    public abstract boolean rayhit(double[] rayorigin,double[] d, int n);
 
     public void move()
     {
@@ -77,6 +77,11 @@ public abstract class Entity
      */
     public double[] getVel() {
         return vel;
+    }
+    public double[] getUnitVRotation()
+    {
+        double[] d = {Math.sin(rot[0])*Math.cos(rot[1]),Math.sin(rot[0])*Math.sin(rot[1]),Math.sin(rot[1])};
+        return d;
     }
 
     /**

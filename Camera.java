@@ -35,7 +35,7 @@ public class Camera extends Entity
     }
     
    @Override
-   public boolean rayhit(double[] rayorigin, double zenith, double azumith, int n) {
+   public boolean rayhit(double[] rayorigin, double[] d, int n) {
        return false;
    }
 
@@ -58,6 +58,16 @@ public class Camera extends Entity
      */
     public int getFov() {
         return fov;
+    }
+    
+    public double getScreenWidth()
+    {
+        return 2.0*Math.tan(fov*Math.PI/360.0);
+    }
+
+    public double getScreenHeight(int pixelWidth, int pixelHeight)
+    {
+        return getScreenWidth()/2.0*pixelHeight/pixelWidth;
     }
 
 
