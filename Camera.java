@@ -5,8 +5,7 @@ public class Camera extends Entity
 
     public Camera(String name)
     {
-        super();
-        this.name = name;
+        this(name,90.0);
     }
     public Camera(String name, double fieldofview)
     {
@@ -59,7 +58,7 @@ public class Camera extends Entity
 
     public double getScreenHeight(int pixelWidth, int pixelHeight)
     {
-        return getScreenWidth()/2.0*pixelHeight/pixelWidth;
+        return getScreenWidth()*pixelHeight/pixelWidth;
     }
 
 

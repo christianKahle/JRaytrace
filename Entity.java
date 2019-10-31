@@ -2,8 +2,6 @@
 public abstract class Entity
 {
     protected Vector pos, rot;
-    public static final Vector  FWD = new Vector (0.0,0.0),
-                                UP = new Vector( );
 
 
     /** Defines an entity positioned at (x,y,z) with rotation (φ,θ)
