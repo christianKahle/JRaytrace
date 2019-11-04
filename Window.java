@@ -19,7 +19,7 @@ public class Window extends JFrame
     ArrayList<Entity> entities;
     Color backColor = Color.BLACK;
     Color frontColor = Color.WHITE;
-    Camera selectedCamera = new Camera("NONE", 120);
+    Camera selectedCamera = new Camera("NONE", 90);
     int fps = 3;
     int windowWidth = 500;
     int windowHeight = 500;
@@ -51,7 +51,7 @@ public class Window extends JFrame
             public void mouseWheelMoved(MouseWheelEvent event)
             {
                 //selectedCamera.setFov(selectedCamera.getFov()+event.getWheelRotation()*2);
-                System.out.println(selectedCamera.getFov());
+                //System.out.println(selectedCamera.getFov());
             }
         };
         this.addMouseListener(mouse);   
@@ -117,15 +117,15 @@ public class Window extends JFrame
         entities = new ArrayList<Entity>();
         //for (int i = 0; i < 2; i++) {entities.add(new Sphere(50.0,5.0,i*75.0, 0.0,0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));entities.add(new Sphere(100.0,5.0,i*75.0, 0.0,-0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));}
         
-        entities.add(new Sphere(new Vector(10.0,0.1,0.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(-10.0,0.0,0.0), new Vector(0.0,0.0), 2.0));
+        entities.add(new Sphere(new Vector(10.0,0.0,0.0), new Vector(0.0,0.0), 5.0));
+        entities.add(new Sphere(new Vector(-10.0,0.0,0.0), new Vector(0.0,0.0), 5.0));
         
-        entities.add(new Sphere(new Vector(0.0,10.0,0.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(0.0,-10.0,0.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(0.0,0.0,10.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(0.0,0.0,-10.0), new Vector(0.0,0.0), 2.0));
+        entities.add(new Sphere(new Vector(0.0,10.0,0.0), new Vector(0.0,0.0), 5.0));
+        entities.add(new Sphere(new Vector(0.0,-10.0,0.0), new Vector(0.0,0.0), 5.0));
+        entities.add(new Sphere(new Vector(0.0,0.0,10.0), new Vector(0.0,0.0), 5.0));
+        entities.add(new Sphere(new Vector(0.0,0.0,-10.0), new Vector(0.0,0.0), 5.0));
 
-        selectedCamera.setRot(new Vector(0,Math.PI/16));
+        selectedCamera.setRot(new Vector(0,Math.PI/8*1.75));
 
         insets = getInsets();
         setSize(insets.left + windowWidth + insets.right,
@@ -168,17 +168,17 @@ public class Window extends JFrame
     }
 
     public void rays()
-    { //TODO Figure out why this isn't making correct rays.
+    {
         Vector p = selectedCamera.getPos();
         Vector a = new Vector(selectedCamera.getRot().get(0)+Math.PI/2,selectedCamera.getRot().get(1)+Math.PI/2);
         Vector t = (new Vector(Math.sin(a.get(0))*Math.sin(a.get(1)),Math.cos(a.get(0)),Math.sin(a.get(0))*Math.cos(a.get(1)))).normalise();
-        Vector b = (new Vector(Math.sin(a.get(0))*Math.cos(a.get(1)),Math.cos(a.get(0)),Math.sin(a.get(0))*Math.sin(a.get(1))));
-        Vector v = t.cross(b);
+        Vector b = (new Vector(Math.sin(a.get(0))*Math.cos(a.get(1)),Math.cos(a.get(0)),Math.sin(a.get(0))*Math.sin(a.get(1)))).normalise();
+        Vector v = t.cross(b).normalise();
         Vector qx = b.prod(selectedCamera.getScreenWidth()/(windowWidth-1.0));
         Vector qy = v.prod(selectedCamera.getScreenHeight(windowWidth,windowHeight)/(windowHeight-1.0));
         for (x = -windowWidth/2; x < windowWidth; x++) {
             for (y = -windowHeight/2; y < windowHeight; y++) {
-                Vector d = (qx.prod(x)).add(qy.prod(y)).normalise();
+                Vector d = t.add(qx.prod(x)).add(qy.prod(y)).normalise();
                 for (Entity en : entities) {if (en.rayhit(p, d, 0)) bbg.drawLine(x, y, x, y);} 
             }
         }   
