@@ -119,11 +119,11 @@ public class Window extends JFrame
         entities = new ArrayList<Entity>();
         //for (int i = 0; i < 2; i++) {entities.add(new Sphere(50.0,5.0,i*75.0, 0.0,0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));entities.add(new Sphere(100.0,5.0,i*75.0, 0.0,-0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));}
         
-        entities.add(new Sphere(new Vector(10.0,0.0,0.0), new Vector(0.0,0.0), 5.0));
-        entities.add(new Sphere(new Vector(-10.0,0.0,0.0), new Vector(0.0,0.0), 5.0));
+        //entities.add(new Sphere(new Vector(10.0,0.0,0.0), new Vector(0.0,0.0), 5.0));
+        //entities.add(new Sphere(new Vector(-10.0,0.0,0.0), new Vector(0.0,0.0), 5.0));
         
-        entities.add(new Sphere(new Vector(0.0,10.0,0.0), new Vector(0.0,0.0), 5.0));
-        entities.add(new Sphere(new Vector(0.0,-10.0,0.0), new Vector(0.0,0.0), 5.0));
+        entities.add(new Sphere(new Vector(0.0,20.0,0.0), new Vector(0.0,0.0), 5.0));
+        entities.add(new Sphere(new Vector(0.0,-20.0,0.0), new Vector(0.0,0.0), 5.0));
         entities.add(new Sphere(new Vector(0.0,0.0,10.0), new Vector(0.0,0.0), 5.0));
         entities.add(new Sphere(new Vector(0.0,0.0,-10.0), new Vector(0.0,0.0), 5.0));
 
@@ -174,8 +174,8 @@ public class Window extends JFrame
     {
         Vector p = selectedCamera.getPos();
         Vector a = new Vector(selectedCamera.getRot().get(0)+Math.PI/2,selectedCamera.getRot().get(1)+Math.PI/2);
-        Vector t = (new Vector(Math.sin(a.get(0))*Math.sin(a.get(1)),Math.sin(a.get(0))*Math.cos(a.get(1)),Math.cos(a.get(0)))).normalise();
-        Vector b = (new Vector(Math.sin(a.get(0)+Math.PI/2)*Math.sin(a.get(1)),Math.sin(a.get(0)+Math.PI/2)*Math.cos(a.get(1)),Math.cos(a.get(0)+Math.PI/2))).normalise();
+        Vector t = (new Vector(Math.sin(a.get(0))*Math.cos(a.get(1)),Math.sin(a.get(0))*Math.sin(a.get(1)),Math.cos(a.get(0)))).normalise();
+        Vector b = (new Vector(Math.sin(a.get(0)+Math.PI/2)*Math.cos(a.get(1)),Math.sin(a.get(0)+Math.PI/2)*Math.sin(a.get(1)),Math.cos(a.get(0)+Math.PI/2))).normalise();
         Vector v = t.cross(b).normalise();
         Vector qx = b.prod(selectedCamera.getScreenWidth()/(windowWidth));
         Vector qy = v.prod(selectedCamera.getScreenHeight(windowWidth,windowHeight)/(windowHeight));
