@@ -19,8 +19,8 @@ public class Window extends JFrame
     ArrayList<Entity> entities;
     Color backColor = Color.BLACK;
     Color frontColor = Color.WHITE;
-    Camera selectedCamera = new Camera("NONE", 90);
-    int fps = 3;
+    Camera selectedCamera = new Camera("NONE", 120);
+    int fps = 10;
     int windowWidth = 500;
     int windowHeight = 500;
     int x,y;
@@ -77,6 +77,8 @@ public class Window extends JFrame
     {
         initialize();
         int frames = 0;
+        draw();
+        draw();
         while(isRunning)
         {
             long time = System.currentTimeMillis();
@@ -125,7 +127,7 @@ public class Window extends JFrame
         entities.add(new Sphere(new Vector(0.0,0.0,10.0), new Vector(0.0,0.0), 5.0));
         entities.add(new Sphere(new Vector(0.0,0.0,-10.0), new Vector(0.0,0.0), 5.0));
 
-        selectedCamera.setRot(new Vector(0,Math.PI/8*1.75));
+        selectedCamera.setRot(new Vector(0,Math.PI/2));
 
         insets = getInsets();
         setSize(insets.left + windowWidth + insets.right,
@@ -140,6 +142,7 @@ public class Window extends JFrame
      */
     void update(){            
         //include code to change scenario how you wish
+        selectedCamera.setRot(selectedCamera.getRot().add(new Vector(Math.PI/16,0.0)));
     }
     
 
@@ -171,14 +174,15 @@ public class Window extends JFrame
     {
         Vector p = selectedCamera.getPos();
         Vector a = new Vector(selectedCamera.getRot().get(0)+Math.PI/2,selectedCamera.getRot().get(1)+Math.PI/2);
-        Vector t = (new Vector(Math.sin(a.get(0))*Math.sin(a.get(1)),Math.cos(a.get(0)),Math.sin(a.get(0))*Math.cos(a.get(1)))).normalise();
-        Vector b = (new Vector(Math.sin(a.get(0))*Math.cos(a.get(1)),Math.cos(a.get(0)),Math.sin(a.get(0))*Math.sin(a.get(1)))).normalise();
+        Vector t = (new Vector(Math.sin(a.get(0))*Math.sin(a.get(1)),Math.sin(a.get(0))*Math.cos(a.get(1)),Math.cos(a.get(0)))).normalise();
+        Vector b = (new Vector(Math.sin(a.get(0)+Math.PI/2)*Math.sin(a.get(1)),Math.sin(a.get(0)+Math.PI/2)*Math.cos(a.get(1)),Math.cos(a.get(0)+Math.PI/2))).normalise();
         Vector v = t.cross(b).normalise();
-        Vector qx = b.prod(selectedCamera.getScreenWidth()/(windowWidth-1.0));
-        Vector qy = v.prod(selectedCamera.getScreenHeight(windowWidth,windowHeight)/(windowHeight-1.0));
-        for (x = -windowWidth/2; x < windowWidth; x++) {
-            for (y = -windowHeight/2; y < windowHeight; y++) {
-                Vector d = t.add(qx.prod(x)).add(qy.prod(y)).normalise();
+        Vector qx = b.prod(selectedCamera.getScreenWidth()/(windowWidth));
+        Vector qy = v.prod(selectedCamera.getScreenHeight(windowWidth,windowHeight)/(windowHeight));
+        for (x = -windowWidth/2; x < windowWidth/2; x++) {
+            for (y = -windowHeight/2; y < windowHeight/2; y++) {
+                Vector d = ((t.add(qx.prod(x))).add(qy.prod(y))).normalise();
+                //if(d.get(1) > 0) bbg.drawLine(x, y, x, y);
                 for (Entity en : entities) {if (en.rayhit(p, d, 0)) bbg.drawLine(x, y, x, y);} 
             }
         }   

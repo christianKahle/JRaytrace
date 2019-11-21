@@ -11,7 +11,7 @@ public class Camera extends Entity
     {
         super();
         this.name = name;
-        fov = fieldofview;
+        fov = Math.min(fieldofview,150);
     }
     public Camera(Vector pos, Vector rot, String name)
     {

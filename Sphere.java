@@ -18,7 +18,7 @@ public class Sphere extends Entity
         Vector v = rayorigin.sub(this.pos);
         double vd  = v.dotprod(direction);
         double v2 = v.dotprod(v);
-        return -vd - Math.sqrt(vd*vd-(v2-radius*radius)) > 0 || -vd + Math.sqrt(vd*vd-(v2-radius*radius)) > 0;
+        return -vd + Math.sqrt(vd*vd-(v2-radius*radius)) > 0 || -vd - Math.sqrt(vd*vd-(v2-radius*radius)) > 0;
     }
 
     /**
