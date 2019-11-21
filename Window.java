@@ -119,15 +119,15 @@ public class Window extends JFrame
         entities = new ArrayList<Entity>();
         //for (int i = 0; i < 2; i++) {entities.add(new Sphere(50.0,5.0,i*75.0, 0.0,0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));entities.add(new Sphere(100.0,5.0,i*75.0, 0.0,-0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));}
         
-        //entities.add(new Sphere(new Vector(10.0,0.0,0.0), new Vector(0.0,0.0), 5.0));
-        //entities.add(new Sphere(new Vector(-10.0,0.0,0.0), new Vector(0.0,0.0), 5.0));
-        
-        entities.add(new Sphere(new Vector(0.0,20.0,0.0), new Vector(0.0,0.0), 5.0));
-        entities.add(new Sphere(new Vector(0.0,-20.0,0.0), new Vector(0.0,0.0), 5.0));
-        entities.add(new Sphere(new Vector(0.0,0.0,10.0), new Vector(0.0,0.0), 5.0));
-        entities.add(new Sphere(new Vector(0.0,0.0,-10.0), new Vector(0.0,0.0), 5.0));
+        entities.add(new Sphere(new Vector(10.0,0.0,0.0), new Vector(0.0,0.0), 2.0));
+        entities.add(new Sphere(new Vector(10.0,0.0,10.0), new Vector(0.0,0.0), 2.0));
+        entities.add(new Sphere(new Vector(-10.0,0.0,10.0), new Vector(0.0,0.0), 2.0));
+        entities.add(new Sphere(new Vector(-10.0,0.0,0.0), new Vector(0.0,0.0), 2.0));
+        entities.add(new Sphere(new Vector(10.0,0.0,0.0), new Vector(0.0,0.0), 2.0));
+        entities.add(new Sphere(new Vector(0.0,0.0,10.0), new Vector(0.0,0.0), 2.0));
+        entities.add(new Sphere(new Vector(0.0,0.0,-10.0), new Vector(0.0,0.0), 2.0));
 
-        selectedCamera.setRot(new Vector(0,Math.PI/2));
+        selectedCamera.setRot(new Vector(0,-Math.PI/2));
 
         insets = getInsets();
         setSize(insets.left + windowWidth + insets.right,
@@ -142,7 +142,7 @@ public class Window extends JFrame
      */
     void update(){            
         //include code to change scenario how you wish
-        selectedCamera.setRot(selectedCamera.getRot().add(new Vector(Math.PI/16,0.0)));
+        selectedCamera.setRot(selectedCamera.getRot().add(new Vector(Math.PI/32,0.0)));
     }
     
 
