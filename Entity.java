@@ -1,8 +1,10 @@
+import java.awt.Color;
 
 public abstract class Entity
 {
     protected Vector pos, rot;
-
+    protected Color color;
+    protected double reflectivity;
 
     /** Defines an entity positioned at (x,y,z) with rotation (φ,θ)
      * +x is FWD, -x is BCK
@@ -13,7 +15,7 @@ public abstract class Entity
 
     public Entity()
     {
-        this(new Vector(0.0,0.0,0.0),new Vector(0.0,0.0));
+        this(new Vector(0.0,0.0,0.0),new Vector(0.0,0.0),Color.WHITE,0.5);
     }
 
     /**
@@ -21,14 +23,17 @@ public abstract class Entity
      * @param pos the cartesian position of the entity (x,y,z)
      * @param rot the rotation of the entity in radians (φ,θ)
      */
-    public Entity(Vector pos, Vector rot)
+    public Entity(Vector pos, Vector rot, Color color, double reflectivity)
     {
         this.pos = pos;
         this.rot = rot;
+        this.color = color;
+        this.reflectivity = reflectivity;
     }
 
     public abstract boolean rayhit(Vector rayorigin,Vector direction, int n);
 
+    public abstract double getRadius();
     /**
      * @return the pos
      */
@@ -51,6 +56,6 @@ public abstract class Entity
      * @param rot the rot to set
      */
     public void setRot(Vector rot) {
-        this.rot = rot;
+        this.rot = new Vector(rot.get(0)%(2*Math.PI),rot.get(1)%(2*Math.PI));
     }
 }

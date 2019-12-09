@@ -1,3 +1,5 @@
+import java.awt.Color;
+
 public class Camera extends Entity
 {
     private String name;
@@ -15,19 +17,19 @@ public class Camera extends Entity
     }
     public Camera(Vector pos, Vector rot, String name)
     {
-        super(pos,rot);
+        super(pos,rot,Color.WHITE,0);
         this.name = name;
     }
     public Camera(Vector pos, Vector rot, String name, double fieldofview)
     {
-        super(pos,rot);
+        super(pos,rot,Color.WHITE,0);
         this.name = name;
         fov = fieldofview;
     }
     
    @Override
    public boolean rayhit(Vector rayorigin, Vector direction, int n) {
-       return false;
+        return false;
    }
 
     /**
@@ -59,6 +61,10 @@ public class Camera extends Entity
     public double getScreenHeight(int pixelWidth, int pixelHeight)
     {
         return getScreenWidth()*pixelHeight/pixelWidth;
+    }
+    public double getRadius()
+    {
+        return 0;
     }
 
 
