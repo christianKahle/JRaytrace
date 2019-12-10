@@ -134,7 +134,7 @@ public class Window extends JFrame
 
         selectedCamera.setRot(new Vector(Math.PI/2.0,Math.PI/2));
         selectedCamera.setPos(new Vector(0.0,6.0,0.0));
-        //selectedCamera.setPos(new Vector(5.0,1.0,0.0));
+
         insets = getInsets();
         setSize(insets.left + windowWidth + insets.right,
                 insets.top + windowHeight + insets.bottom);
@@ -222,14 +222,14 @@ public class Window extends JFrame
                 frustumCull[i] = true;}                                                                 //sets entity at index i to be culled
         
         //Top Frustum
-        n = dir.add(fovh).toSpherical();                                                                // Calculate plane normal for top frustum
+        n = dir.sub(fovh).add(new Vector(0.0, Math.PI/2)).toSpherical();                                                                // Calculate plane normal for top frustum
         d = -selectedCamera.getPos().dotprod(n);                                                        // calculate plane's distance to origin normal to plane
         for (int i = 0; i < frustumCull.length; i++) {                                                  // go through each entity to check if above plane
             if(entities.get(i).getPos().dotprod(n)+d+entities.get(i).getRadius()<0)                     // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
                 frustumCull[i] = true;}                                                                 //sets entity at index i to be culled
 
         //Bottom Frustum
-        n = dir.sub(fovh).toSpherical();                                                                // Calculate plane normal for bottom frustum
+        n = dir.add(fovh).sub(new Vector(0.0,Math.PI/2)).toSpherical();                                                                // Calculate plane normal for bottom frustum
         d = -selectedCamera.getPos().dotprod(n);                                                        // calculate plane's distance to origin normal to plane
         for (int i = 0; i < frustumCull.length; i++) {                                                  // go through each entity to check if above plane
             if(entities.get(i).getPos().dotprod(n)+d+entities.get(i).getRadius()<0)                     // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
