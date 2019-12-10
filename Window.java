@@ -25,6 +25,7 @@ public class Window extends JFrame
     int windowHeight = 450;
     int x,y;
     int button = 0;
+    int cores = Runtime.getRuntime().availableProcessors();
     static Window simulation;
     Graphics g, bbg;
 
@@ -118,18 +119,22 @@ public class Window extends JFrame
         
         entities = new ArrayList<Entity>();
         //for (int i = 0; i < 2; i++) {entities.add(new Sphere(50.0,5.0,i*75.0, 0.0,0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));entities.add(new Sphere(100.0,5.0,i*75.0, 0.0,-0.25,-1.0, 0.0,0.0, 0.0,0.0, 10.0));}
+        double sq2 = Math.sqrt(2)*10;
+        for (int i = 0; i < 3; i++) {
+            entities.add(new Sphere(new Vector(10.0,i*6,0.0), new Vector(0.0,0.0), 2.0));
+            entities.add(new Sphere(new Vector(-10.0,i*6,0.0), new Vector(0.0,0.0), 2.0));
+            entities.add(new Sphere(new Vector(0.0,i*6,10.0), new Vector(0.0,0.0), 2.0));
+            entities.add(new Sphere(new Vector(0.0,i*6,-10.0), new Vector(0.0,0.0), 2.0));
+            entities.add(new Sphere(new Vector(sq2,i*6,sq2), new Vector(0.0,0.0), 2.0));
+            entities.add(new Sphere(new Vector(-sq2,i*6,sq2), new Vector(0.0,0.0), 2.0));
+            entities.add(new Sphere(new Vector(-sq2,i*6,-sq2), new Vector(0.0,0.0), 2.0));
+            entities.add(new Sphere(new Vector(sq2,i*6,-sq2), new Vector(0.0,0.0), 2.0));   
+        }
         
-        entities.add(new Sphere(new Vector(10.0,0.0,0.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(-10.0,0.0,0.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(0.0,0.0,10.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(0.0,0.0,-10.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(10.0,0.0,10.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(-10.0,0.0,10.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(-10.0,0.0,-10.0), new Vector(0.0,0.0), 2.0));
-        entities.add(new Sphere(new Vector(10.0,0.0,-10.0), new Vector(0.0,0.0), 2.0));
 
-        selectedCamera.setRot(new Vector(0,-Math.PI/2));
-
+        selectedCamera.setRot(new Vector(Math.PI/2.0,Math.PI/2));
+        selectedCamera.setPos(new Vector(0.0,6.0,0.0));
+        //selectedCamera.setPos(new Vector(5.0,1.0,0.0));
         insets = getInsets();
         setSize(insets.left + windowWidth + insets.right,
                 insets.top + windowHeight + insets.bottom);
@@ -143,7 +148,7 @@ public class Window extends JFrame
      */
     void update(){            
         //include code to change scenario how you wish
-        selectedCamera.setRot(selectedCamera.getRot().add(new Vector(Math.PI/100.0,0.0)));
+        selectedCamera.setRot(selectedCamera.getRot().add(new Vector(Math.PI/180.0,0.0)));
     }
     
 
@@ -173,72 +178,68 @@ public class Window extends JFrame
 
     public void rays()
     {
-        Vector a = new Vector(selectedCamera.getRot().get(0)+Math.PI/2,selectedCamera.getRot().get(1)+Math.PI/2);
-        ArrayList<Entity> frustumEntities = frustumCulling(a);
-        //ArrayList<Entity> frustumEntities = entities;
-        Vector p = selectedCamera.getPos();
+        Vector a = selectedCamera.rot.add(new Vector(Math.PI/2.0,Math.PI/2.0));
         
-        Vector t = (new Vector(Math.sin(a.get(0))*Math.cos(a.get(1)),Math.sin(a.get(0))*Math.sin(a.get(1)),Math.cos(a.get(0)))).normalise();
-        Vector b = (new Vector(Math.sin(a.get(0)+Math.PI/2)*Math.cos(a.get(1)),Math.sin(a.get(0)+Math.PI/2)*Math.sin(a.get(1)),Math.cos(a.get(0)+Math.PI/2))).normalise();
-        Vector v = t.cross(b).normalise();
+        ArrayList<Entity> frustumEntities = frustumCulling(a,1,0);
+        //ArrayList<Entity> frustumEntities = entities;
+
+        Vector t = a.toSpherical();
+        Vector b = a.add(new Vector(Math.PI/2.0,0)).toSpherical();
+        Vector v = t.cross(b);
+
         Vector qx = b.prod(selectedCamera.getScreenWidth()/(windowWidth));
         Vector qy = v.prod(selectedCamera.getScreenHeight(windowWidth,windowHeight)/(windowHeight));
         for (x = -windowWidth/2; x < windowWidth/2; x++) {
             for (y = -windowHeight/2; y < windowHeight/2; y++) {
-                Vector d = ((t.add(qx.prod(x))).add(qy.prod(y))).normalise();
-                //if(d.get(1) > 0) bbg.drawLine(x, y, x, y);
-                for (Entity en : frustumEntities) {if (en.rayhit(p, d, 0)) bbg.drawLine(x, y, x, y);} 
+                Vector d = ((t.add(qx.prod(x))).add(qy.prod(y))).normalize();
+                for (Entity en : frustumEntities) {if (en.rayhit(selectedCamera.getPos(), d, 0)) bbg.drawLine(x, y, x, y);} 
             }
         }   
     }
     
-    public ArrayList<Entity> frustumCulling(Vector dir)
+    public ArrayList<Entity> frustumCulling(Vector dir, int subdivisions, int subdivision)
     {
-        boolean[] frustumCull = new boolean[entities.size()]; //if true, entity will be culled
-        Vector n1,n2;
+        boolean[] frustumCull = new boolean[entities.size()];                              //if true, entity at index i will be culled
+        Vector n;                                                                                                       
         double d;
+        Vector fovw = new Vector((1.0-selectedCamera.getFov()/180.0)/subdivisions*Math.PI,0);
+        Vector fovh = new Vector(0.0,(1.0-selectedCamera.getFov()/180.0)/2.0*Math.PI*windowHeight/windowWidth);
+        dir = dir.sub(fovw.prod(subdivisions/2.0));
+
+        
+        //Left Frustum
+        n = dir.add(fovw.prod(subdivision)).add(new Vector(Math.PI/2,0.0)).toSpherical();               // Calculate plane normal for left frustum
+        d = -selectedCamera.getPos().dotprod(n);                                                        // calculate plane's distance to origin normal to plane
+        for (int i = 0; i < frustumCull.length; i++) {                                                  // go through each entity to check if above plane
+            if(entities.get(i).getPos().dotprod(n)+d+entities.get(i).getRadius()<0)                     // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
+                frustumCull[i] = true;}                                                                 //sets entity at index i to be culled
 
         //Right Frustum
-        n1 = dir.sub(new Vector(selectedCamera.getFov()/180/2*Math.PI,0.0)); // Calculate plane normal
-        n2 = new Vector(Math.sin(n1.get(0))*Math.cos(n1.get(1)),Math.sin(n1.get(0))*Math.sin(n1.get(1)),Math.cos(n1.get(0))); // convert angular vector into unit vector
-        d = -selectedCamera.getPos().dotprod(n2); // calculate plane's negative distance to origin normal to plane
-        for (int i = 0; i < frustumCull.length; i++) { // go through each entity to check if above plane
-            if(entities.get(i).getPos().dotprod(n2)+d+entities.get(i).getRadius()<0) // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
-                frustumCull[i] = true; //sets entity at index i to be culled
-        }
-
-        //Left Frustum
-        n1 = dir.add(new Vector(selectedCamera.getFov()/180/2*Math.PI,0.0)); // Calculate plane normal
-        n2 = new Vector(Math.sin(n1.get(0))*Math.cos(n1.get(1)),Math.sin(n1.get(0))*Math.sin(n1.get(1)),Math.cos(n1.get(0))); // convert angular vector into unit vector
-        d = -selectedCamera.getPos().dotprod(n2); // calculate plane's distance to origin normal to plane
-        for (int i = 0; i < frustumCull.length; i++) { // go through each entity to check if above plane
-            if(entities.get(i).getPos().dotprod(n2)+d+entities.get(i).getRadius()<0) // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
-                frustumCull[i] = true; //sets entity at index i to be culled
-
-        }
-
+        n = dir.add(fovw.prod(subdivisions-subdivision)).sub(new Vector(Math.PI/2,0.0)).toSpherical();  // Calculate plane normal for left frustum
+        d = -selectedCamera.getPos().dotprod(n);                                                        // calculate plane's distance to origin normal to plane
+        for (int i = 0; i < frustumCull.length; i++) {                                                  // go through each entity to check if above plane
+            if(entities.get(i).getPos().dotprod(n)+d+entities.get(i).getRadius()<0)                     // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
+                frustumCull[i] = true;}                                                                 //sets entity at index i to be culled
+        
         //Top Frustum
-        n1 = dir.add(new Vector(0.0,selectedCamera.getFov()/180/2*Math.PI*windowHeight/windowWidth)); // Calculate plane normal
-        n2 = new Vector(Math.sin(n1.get(0))*Math.cos(n1.get(1)),Math.sin(n1.get(0))*Math.sin(n1.get(1)),Math.cos(n1.get(0))); // convert angular vector into unit vector
-        d = -selectedCamera.getPos().dotprod(n2); // calculate plane's distance to origin normal to plane
-        for (int i = 0; i < frustumCull.length; i++) { // go through each entity to check if above plane
-            if(entities.get(i).getPos().dotprod(n2)+d+entities.get(i).getRadius()<0) // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
-                frustumCull[i] = true; //sets entity at index i to be culled
-        }
+        n = dir.add(fovh).toSpherical();                                                                // Calculate plane normal for top frustum
+        d = -selectedCamera.getPos().dotprod(n);                                                        // calculate plane's distance to origin normal to plane
+        for (int i = 0; i < frustumCull.length; i++) {                                                  // go through each entity to check if above plane
+            if(entities.get(i).getPos().dotprod(n)+d+entities.get(i).getRadius()<0)                     // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
+                frustumCull[i] = true;}                                                                 //sets entity at index i to be culled
 
         //Bottom Frustum
-        n1 = dir.sub(new Vector(0.0,selectedCamera.getFov()/180/2*Math.PI*windowHeight/windowWidth)); // Calculate plane normal
-        n2 = new Vector(Math.sin(n1.get(0))*Math.cos(n1.get(1)),Math.sin(n1.get(0))*Math.sin(n1.get(1)),Math.cos(n1.get(0))); // convert angular vector into unit vector
-        d = -selectedCamera.getPos().dotprod(n2); // calculate plane's distance to origin normal to plane
-        for (int i = 0; i < frustumCull.length; i++) { // go through each entity to check if above plane
-            if(entities.get(i).getPos().dotprod(n2)+d+entities.get(i).getRadius()<0) // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
-                frustumCull[i] = true; //sets entity at index i to be culled
+        n = dir.sub(fovh).toSpherical();                                                                // Calculate plane normal for bottom frustum
+        d = -selectedCamera.getPos().dotprod(n);                                                        // calculate plane's distance to origin normal to plane
+        for (int i = 0; i < frustumCull.length; i++) {                                                  // go through each entity to check if above plane
+            if(entities.get(i).getPos().dotprod(n)+d+entities.get(i).getRadius()<0)                     // distance to origin - plane's distance to origin + radius > 0 (is the entity above or intersecting the plane?)
+                frustumCull[i] = true;                                                                  //sets entity at index i to be culled
         }
-
-        ArrayList<Entity> frustumEntities = new ArrayList<Entity>(); //Create new empty entity list
-        for (int i = 0; i < frustumCull.length; i++) { //loop through entities, culling them using frustumCull boolean array
-            if(!frustumCull[i]) frustumEntities.add(entities.get(i));
-        }
-        return frustumEntities;
+        
+        ArrayList<Entity> frustumEntities = new ArrayList<Entity>();                                    //Create new empty entity list
+        for (int i = 0; i < frustumCull.length; i++) {                                                  //loop through entities
+            if(!frustumCull[i]) frustumEntities.add(entities.get(i));                                   //selecting non-culled entities using frustumCull
+        }  
+        return frustumEntities;                                                                         //return entities within frustum
     }
 }
