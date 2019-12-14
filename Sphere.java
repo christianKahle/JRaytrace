@@ -26,11 +26,28 @@ public class Sphere extends Entity
     }
 
     @Override
-    public boolean rayhit(Vector rayorigin, Vector direction, int n) {
-        Vector v = rayorigin.sub(this.pos);
-        double vd  = v.dotprod(direction);
+    public double distance(Ray ray) {
+        Vector v = ray.getPos().sub(pos);
+        double vd  = v.dotprod(ray.getDirection());
         double v2 = v.dotprod(v);
-        return (-vd + Math.sqrt(vd*vd-(v2-radius*radius)) > 0 || -vd - Math.sqrt(vd*vd-(v2-radius*radius)) > 0);
+        double t = Math.min(-vd + Math.sqrt(vd*vd-(v2-radius*radius)), -vd - Math.sqrt(vd*vd-(v2-radius*radius)));
+        if (t < 0)
+            return 0.0;
+        return t;
+    }
+
+    @Override
+    public Ray reflect(Ray ray, double distance)
+    {
+        Vector x = ray.getPos().add(ray.getDirection().prod(distance));
+        Vector n = x.sub(pos).normalize();
+        Vector r = ray.getDirection().sub(n.prod(2*n.dotprod(ray.getDirection())));
+        return new Ray(x,r);
+    }
+    @Override
+    public Ray refract(Ray ray, double distance) {
+        // TODO Refractions
+        return null;
     }
 
     /**

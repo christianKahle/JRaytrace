@@ -1,6 +1,4 @@
-import java.awt.Color;
-
-public class Camera extends Entity
+public class Camera extends BaseEntity
 {
     private String name;
     private double fov = 90;
@@ -17,20 +15,15 @@ public class Camera extends Entity
     }
     public Camera(Vector pos, Vector rot, String name)
     {
-        super(pos,rot,Color.WHITE,0);
+        super(pos,rot);
         this.name = name;
     }
     public Camera(Vector pos, Vector rot, String name, double fieldofview)
     {
-        super(pos,rot,Color.WHITE,0);
+        super(pos,rot);
         this.name = name;
         fov = fieldofview;
     }
-    
-   @Override
-   public boolean rayhit(Vector rayorigin, Vector direction, int n) {
-        return false;
-   }
 
     /**
      * @param fov the fov to set
