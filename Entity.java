@@ -1,8 +1,7 @@
 import java.awt.Color;
 
-public abstract class Entity
+public abstract class Entity extends BaseEntity
 {
-    protected Vector pos, rot;
     protected Color color;
     protected double reflectivity;
 
@@ -15,7 +14,7 @@ public abstract class Entity
 
     public Entity()
     {
-        this(new Vector(0.0,0.0,0.0),new Vector(0.0,0.0),Color.WHITE,0.5);
+        this(new Vector(3),new Vector(2),Color.WHITE,0.5);
     }
 
     /**
@@ -31,31 +30,8 @@ public abstract class Entity
         this.reflectivity = reflectivity;
     }
 
-    public abstract boolean rayhit(Vector rayorigin,Vector direction, int n);
-
+    public abstract double distance(Ray ray);
+    public abstract Ray reflect(Ray ray,double distance);
+    public abstract Ray refract(Ray ray,double distance);
     public abstract double getRadius();
-    /**
-     * @return the pos
-     */
-    public Vector getPos() {
-        return pos;
-    }
-    /**
-     * @return the rot
-     */
-    public Vector getRot() {
-        return rot;
-    }
-    /**
-     * @param pos the pos to set
-     */
-    public void setPos(Vector pos) {
-        this.pos = pos;
-    }
-    /**
-     * @param rot the rot to set
-     */
-    public void setRot(Vector rot) {
-        this.rot = new Vector(rot.get(0)%(2*Math.PI),rot.get(1)%(2*Math.PI));
-    }
 }
