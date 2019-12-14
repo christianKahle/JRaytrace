@@ -14,6 +14,13 @@ public class Vector
         }
         elements = d;
     }
+    public Vector(int n)
+    {
+        elements = new double[n];
+    }
+
+
+
     
     /**
      * @return Double array of this Vector's elements
@@ -71,7 +78,7 @@ public class Vector
     public double dotprod(Vector that)
     {
         if(this.length() != that.length())
-            throw new IndexOutOfBoundsException();
+            throw new IndexOutOfBoundsException("Vector one length:"+this.length()+" != Vector two length:"+that.length());
         double sum = 0.0;
         for (int i = 0; i < elements.length; i++) 
             sum += this.elements[i] * that.elements[i];
@@ -144,14 +151,30 @@ public class Vector
     }
 
     /**
-     * Vector this is converted from spherical angles (azumuth,zenith) to a spherical unit vector (x.y,z).
+     * Vector this is converted from spherical angles (φ,θ) to a cartesian unit vector (x.y,z).
+     * @return 3d unit Vector representation of this spherical angle Vector
+     */
+    public Vector toCartesian() 
+    {
+        if(this.elements.length == 2)
+            return new Vector(Math.sin(elements[0])*Math.cos(elements[1]),Math.sin(elements[0])*Math.sin(elements[1]),Math.cos(elements[0]));
+        if(this.elements.length == 3)
+            return (new Vector(Math.sin(elements[0])*Math.cos(elements[1]),Math.sin(elements[0])*Math.sin(elements[1]),Math.cos(elements[0])).prod(elements[2]));
+        throw new IndexOutOfBoundsException("Vector Length Exception: vector length must be 2 or 3");
+    }
+    /**
+     * Vector this is converted from cartesian vector (x.y,z) to a spherical angles and radius* (φ,θ[,r]).
+     * *if the vector is a unit vector (r = 1), this method will return only angles (φ,θ)
      * @return 3d unit Vector representation of this spherical angle Vector
      */
     public Vector toSpherical() 
     {
-        if(this.elements.length != 2)
-            throw new IndexOutOfBoundsException("Vector Length Exception: vector length must be 2");
-        return new Vector(Math.sin(elements[0])*Math.cos(elements[1]),Math.sin(elements[0])*Math.sin(elements[1]),Math.cos(elements[0]));
+        if(this.elements.length != 3)
+            throw new IndexOutOfBoundsException("Vector Length Exception: vector length must be 3");
+        if(this.abs() == 1.0)
+            return new Vector (Math.atan(elements[2]/elements[1]),Math.acos(elements[1]/(Math.sqrt(elements[0]*elements[0]+elements[1]*elements[1]+elements[2]*elements[2]))));
+        return new Vector (Math.atan(elements[2]/elements[1]),Math.acos(elements[1]/(Math.sqrt(elements[0]*elements[0]+elements[1]*elements[1]+elements[2]*elements[2]))),this.abs());
+        
     }
 
     /**
