@@ -11,17 +11,12 @@ public class Sphere extends Entity
     }
     public Sphere(Vector pos, Vector rot, double radius)
     {
-        super(pos,rot,Color.WHITE,0.5);
+        super(pos,rot,false);
         this.radius = radius;
     }
-    public Sphere(Vector pos, Vector rot, double radius, Color color)
+    public Sphere(Vector pos, Vector rot, double radius, boolean light)
     {
-        super(pos,rot,color,0.5);
-        this.radius = radius;
-    }
-    public Sphere(Vector pos, Vector rot, double radius, Color color, double reflectivity)
-    {
-        super(pos,rot,color,reflectivity);
+        super(pos,rot,light);
         this.radius = radius;
     }
 

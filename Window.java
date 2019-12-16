@@ -24,10 +24,10 @@ public class Window extends JFrame
     boolean frustum = true;
     int windowWidth = 400;
     int windowHeight = 225;
-    int reflections = 2;
+    int reflections = 3;
     int x,y;
     int button = 0;
-    java.awt.Color[] reflectionColors = getReflectionColors();
+    Color[] reflectionColors = new Color[12];
     int cores = Runtime.getRuntime().availableProcessors();
     static Window simulation;
     Graphics g, bbg;
@@ -54,8 +54,7 @@ public class Window extends JFrame
             }
             public void mouseWheelMoved(MouseWheelEvent event)
             {
-                //reflections += event.getWheelRotation();
-                //System.out.println(reflections);
+
             }
         };
         this.addMouseListener(mouse);   
@@ -74,12 +73,14 @@ public class Window extends JFrame
     public void setEntities(ArrayList<Entity> entities) {
         this.entities = entities;
     }
-    public java.awt.Color[] getReflectionColors()
+    public Color[] getReflectionColors()
     {
-        java.awt.Color[] reflectionColors = new java.awt.Color[reflections+1];
-        for (int i = 0; i < reflectionColors.length; i++) {
-            reflectionColors[i] = new java.awt.Color((int)(frontColor.getRed()-backColor.getRed())/(reflections+1)*(i+1),(int)(frontColor.getGreen()-backColor.getGreen())/(reflections+1)*(i+1),(int)(frontColor.getBlue()-backColor.getBlue())/(reflections+1)*(i+1));
-        }
+        Color[] reflectionColors = new Color[reflections+2];
+        reflectionColors[0] = backColor;
+        reflectionColors[reflectionColors.length-1] = frontColor; 
+        for (int i = 1; i < reflectionColors.length-1; i++) {
+            reflectionColors[i] = new Color((int)(frontColor.getRed()-backColor.getRed())/(reflections+2)*(i+1),(int)(frontColor.getGreen()-backColor.getGreen())/(reflections+2)*(i+1),(int)(frontColor.getBlue()-backColor.getBlue())/(reflections+2)*(i+1));
+        } 
         return reflectionColors;
     }
     /**
@@ -129,19 +130,21 @@ public class Window extends JFrame
         setResizable(true);
         setDefaultCloseOperation(EXIT_ON_CLOSE);
         setVisible(true);
-        entities = new ArrayList<Entity>();
-        double sq2 = Math.sqrt(2)*10;
-        for (int i = 0; i < 3; i++) {
-            entities.add(new Sphere(new Vector(10.0,i*6+1,0.0), new Vector(2), 2.0));
-            entities.add(new Sphere(new Vector(-10.0,i*6+1,0.0), new Vector(2), 2.0));
-            entities.add(new Sphere(new Vector(0.0,i*6+1,10.0), new Vector(2), 2.0));
-            entities.add(new Sphere(new Vector(0.0,i*6+1,-10.0), new Vector(2), 2.0));
-            entities.add(new Sphere(new Vector(sq2,i*6+1,sq2), new Vector(2), 2.0));
-            entities.add(new Sphere(new Vector(-sq2,i*6+1,sq2), new Vector(2), 2.0));
-            entities.add(new Sphere(new Vector(-sq2,i*6+1,-sq2), new Vector(2), 2.0));
-            entities.add(new Sphere(new Vector(sq2,i*6+1,-sq2), new Vector(2), 2.0));   
-        }
+        reflectionColors = getReflectionColors();
 
+        entities = new ArrayList<Entity>();
+        double sq2 = Math.sqrt(2)*5;
+        for (int i = 0; i < 3; i++) {
+            entities.add(new Sphere(new Vector(10.0,i*6,0.0), new Vector(2), 2.0,true));
+            entities.add(new Sphere(new Vector(-10.0,i*6,0.0), new Vector(2), 2.0,true));
+            entities.add(new Sphere(new Vector(0.0,i*6,10.0), new Vector(2), 2.0));
+            entities.add(new Sphere(new Vector(0.0,i*6,-10.0), new Vector(2), 2.0));
+            entities.add(new Sphere(new Vector(sq2,i*6,sq2), new Vector(2), 2.0));
+            entities.add(new Sphere(new Vector(-sq2,i*6,sq2), new Vector(2), 2.0));
+            entities.add(new Sphere(new Vector(-sq2,i*6,-sq2), new Vector(2), 2.0));
+            entities.add(new Sphere(new Vector(sq2,i*6,-sq2), new Vector(2), 2.0));   
+        }
+        //entities.add(new Sphere(new Vector(0.0,-20,0.0),new Vector(2),10.0,true));
         selectedCamera.setRot(new Vector(Math.PI/2.0,Math.PI/2));
         selectedCamera.setPos(new Vector(0.0,6.0,0.0));
 
@@ -184,6 +187,7 @@ public class Window extends JFrame
         bbg.setColor(Color.DARK_GRAY); //Draw Crosshair
         bbg.drawLine(windowHeight/100, 0, -windowHeight/100, 0);
         bbg.drawLine(0, windowHeight/100, 0, -windowHeight/100);
+        
 
         g.drawImage(backBuffer, insets.left, insets.top, this);
     }
@@ -195,8 +199,9 @@ public class Window extends JFrame
         if (frustum)
             frustumEntities = frustumCulling(a,1,0);
         else
-            frustumEntities = entities;
+            frustumEntities = new ArrayList<Entity>(entities);
         Vector c = a.toCartesian();
+        
         Vector b = a.add(new Vector(Math.PI/2.0,0)).toCartesian();
         Vector v = c.cross(b);
 
@@ -222,10 +227,16 @@ public class Window extends JFrame
                     }
                 }
                 if(closestIndex != -1)
-                    setpixelcolor(reflections(frustumEntities.get(closestIndex),d,l,0),x,y);
-            
+                {  
+                    if(frustumEntities.get(closestIndex).light)
+                        bbg.drawLine(x,y,x,y);
+                    else if(reflections(frustumEntities.get(closestIndex),d,l,0)>=0)
+                        bbg.drawLine(x,y,x,y);
+                }
             }
-        }   
+        }
+        bbg.setColor(frontColor);
+        bbg.drawString(c.toString(), 10-windowWidth/2, 10-windowHeight/2);   
     }
     void setpixelcolor(int reflects,int x, int y)
     {
@@ -234,13 +245,14 @@ public class Window extends JFrame
     }
     public int reflections(Entity e,Ray r,double d, int n)
     {
-        if(n>=reflections) return n;
+        if(n>reflections-1) return -1;
         Ray reflected = e.reflect(r, d);
+        ArrayList<Entity> others = new ArrayList<Entity>(entities); others.remove(e);
         int closestIndex = -1;
         double l = 0.0,t = 0.0;
-        for(int i = 0;i < entities.size();i++)
+        for(int i = 0;i < others.size();i++)
         {
-            t = entities.get(i).distance(reflected);
+            t = others.get(i).distance(reflected);
                         if (t<l || (t>0.0 && closestIndex == -1))   //if another entity is closer:
                         {
                             l = t;                                  // store distance to closer entity
@@ -248,8 +260,14 @@ public class Window extends JFrame
                         }
         }
         if(closestIndex != -1)
-            return reflections(entities.get(closestIndex),reflected,l,n+1);
-        return n;
+        {
+            if(others.get(closestIndex).light)
+            {
+                return n;
+            }
+            return reflections(others.get(closestIndex),reflected,l,n+1);
+        }
+        return -1;
     }
     
     

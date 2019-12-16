@@ -2,8 +2,7 @@ import java.awt.Color;
 
 public abstract class Entity extends BaseEntity
 {
-    protected Color color;
-    protected double reflectivity;
+    protected boolean light;
 
     /** Defines an entity positioned at (x,y,z) with rotation (φ,θ)
      * +x is FWD, -x is BCK
@@ -14,7 +13,7 @@ public abstract class Entity extends BaseEntity
 
     public Entity()
     {
-        this(new Vector(3),new Vector(2),Color.WHITE,0.5);
+        this(new Vector(3),new Vector(2),false);
     }
 
     /**
@@ -22,12 +21,12 @@ public abstract class Entity extends BaseEntity
      * @param pos the cartesian position of the entity (x,y,z)
      * @param rot the rotation of the entity in radians (φ,θ)
      */
-    public Entity(Vector pos, Vector rot, Color color, double reflectivity)
+    public Entity(Vector pos, Vector rot, boolean light)
     {
         this.pos = pos;
         this.rot = rot;
-        this.color = color;
-        this.reflectivity = reflectivity;
+        this.light = light;
+ 
     }
 
     public abstract double distance(Ray ray);
