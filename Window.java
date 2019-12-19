@@ -18,14 +18,14 @@ public class Window extends JFrame
     boolean isRunning = true;
     ArrayList<Entity> entities;
     Color backColor = Color.BLACK;
-    Color global = new Color(20,20,20);
+    double global = 0.0;
     Color frontColor = Color.WHITE;
     Camera selectedCamera = new Camera("NONE", 90);
     int fps = 30;
     boolean frustum = true;
     int windowWidth = 400;
     int windowHeight = 225;
-    int reflections = 4;
+    int reflections = 2;
     int x,y;
     int button = 0;
     Color[] reflectionColors = new Color[12];
@@ -208,59 +208,31 @@ public class Window extends JFrame
 
         Vector qx = b.prod(selectedCamera.getScreenWidth()/(windowWidth));
         Vector qy = v.prod(selectedCamera.getScreenHeight(windowWidth,windowHeight)/(windowHeight));
-        double t,l;
-        int closestIndex;
+        double light;
         Ray d = new Ray(selectedCamera.getPos(), new Vector(3));
         for (x = -windowWidth/2; x < windowWidth/2; x++) {
             for (y = -windowHeight/2; y < windowHeight/2; y++) {
                 d.setDirection(c.add(qx.prod(x)).add(qy.prod(y)).normalize());
-                
-                closestIndex = -1;
-                t = 0.0;
-                l = 0.0;
-                for (int i = 0; i < frustumEntities.size(); i++) 
-                {
-                    t = frustumEntities.get(i).distance(d);
-                    if(t<l || (t>0.0 && closestIndex == -1))
-                    {
-                        l = t;
-                        closestIndex = i;
-                    }
-                }
-                if(closestIndex != -1)
-                {  
-                    bbg.setColor(frontColor);
-                    if(frustumEntities.get(closestIndex).light)
+                light = reflections(d,frustumEntities);
+                        bbg.setColor(new Color((int)(light*255),(int)(light*255),(int)(light*255)));
                         bbg.drawLine(x,y,x,y);
-                    else if(reflections(frustumEntities.get(closestIndex),d,l,0)>=0)
-                        bbg.drawLine(x,y,x,y);
-                    else
-                    {
-                        bbg.setColor(global);
-                        bbg.drawLine(x, y, x, y);
-                    }
-
-                }
-            }
         }
         bbg.setColor(frontColor);
-        bbg.drawString(c.toString(), 10-windowWidth/2, 10-windowHeight/2);   
+        bbg.drawString(c.toString(), 10-windowWidth/2, 10-windowHeight/2);
+        } 
     }
     void setpixelcolor(int reflects,int x, int y)
     {
         bbg.setColor(reflectionColors[reflects]);
         bbg.drawLine(x, y, x, y);
     }
-    public int reflections(Entity e,Ray r,double d, int n)
+    public double reflections(Ray r, ArrayList<Entity> frustum)
     {
-        if(n>reflections-1) return -1;
-        Ray reflected = e.reflect(r, d);
-        ArrayList<Entity> others = new ArrayList<Entity>(entities); others.remove(e);
-        int closestIndex = -1;
         double l = 0.0,t = 0.0;
-        for(int i = 0;i < others.size();i++)
+        int closestIndex = -1;
+        for(int i = 0;i < frustum.size();i++)
         {
-            t = others.get(i).distance(reflected);
+            t = frustum.get(i).distance(r);
                         if (t<l || (t>0.0 && closestIndex == -1))   //if another entity is closer:
                         {
                             l = t;                                  // store distance to closer entity
@@ -269,13 +241,44 @@ public class Window extends JFrame
         }
         if(closestIndex != -1)
         {
+            Ray reflected = frustum.get(closestIndex).reflect(r, l);
+            double diffuse = Math.abs(r.getDirection().dotprod(reflected.getDirection())-2)/3;
+            if(frustum.get(closestIndex).light)
+            {
+                
+                return diffuse;
+            }
+            return diffuse*Math.max(global,reflections(frustum.get(closestIndex),reflected,l,0));
+        }
+        return 0.0;
+    }
+    public double reflections(Entity e,Ray r,double d, int n)
+    {
+        if(n>reflections-1) return global;
+        ArrayList<Entity> others = new ArrayList<Entity>(entities); others.remove(e);
+        int closestIndex = -1;
+        double l = 0.0,t = 0.0;
+        for(int i = 0;i < others.size();i++)
+        {
+            t = others.get(i).distance(r);
+                        if (t<l || (t>0.0 && closestIndex == -1))   //if another entity is closer:
+                        {
+                            l = t;                                  // store distance to closer entity
+                            closestIndex = i;                       // store entity in temporary field
+                        }
+        }
+        
+        if(closestIndex != -1)
+        {
+            Ray reflected = others.get(closestIndex).reflect(r, d);
+            double diffuse = Math.abs(r.getDirection().dotprod(reflected.getDirection())-2)/3;
             if(others.get(closestIndex).light)
             {
-                return n;
+                return diffuse;
             }
-            return reflections(others.get(closestIndex),reflected,l,n+1);
+            return diffuse*reflections(others.get(closestIndex),reflected,l,n+1);
         }
-        return -1;
+        return global;
     }
     
     
