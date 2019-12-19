@@ -18,13 +18,14 @@ public class Window extends JFrame
     boolean isRunning = true;
     ArrayList<Entity> entities;
     Color backColor = Color.BLACK;
+    Color global = new Color(20,20,20);
     Color frontColor = Color.WHITE;
     Camera selectedCamera = new Camera("NONE", 90);
     int fps = 30;
     boolean frustum = true;
     int windowWidth = 400;
     int windowHeight = 225;
-    int reflections = 3;
+    int reflections = 4;
     int x,y;
     int button = 0;
     Color[] reflectionColors = new Color[12];
@@ -228,10 +229,17 @@ public class Window extends JFrame
                 }
                 if(closestIndex != -1)
                 {  
+                    bbg.setColor(frontColor);
                     if(frustumEntities.get(closestIndex).light)
                         bbg.drawLine(x,y,x,y);
                     else if(reflections(frustumEntities.get(closestIndex),d,l,0)>=0)
                         bbg.drawLine(x,y,x,y);
+                    else
+                    {
+                        bbg.setColor(global);
+                        bbg.drawLine(x, y, x, y);
+                    }
+
                 }
             }
         }
